@@ -10,7 +10,6 @@ import {
 } from "firebase/firestore";
 import {db} from "./firebase";
 
-
 function refreshPage() {
     window.location.reload()
 }
@@ -51,6 +50,13 @@ function App() {
 
     const createScore = async () => {
         const docRef = await addDoc(collection(db, 'scores'), resultObj)
+    }
+
+    async function getAudio() {
+        let audio = await new Audio();
+        audio.src = "https://pod-zvonok.ru/_ld/52/5216_pod-zvonok.ru__.mp3";
+        audio.volume = 1;
+        audio.play()
     }
 
     function speedSnake(currentScore) {
@@ -108,6 +114,7 @@ function App() {
         }
 
         if (head.x === food.x && head.y === food.y) {
+            getAudio()
             setFood({x: Math.ceil(Math.random() * (grid - 1)), y: Math.ceil(Math.random() * (grid - 1))})
             setScore((score !== 0 ? score + 1 : 1))
             setSnake([newHead, ...snake])
@@ -123,11 +130,10 @@ function App() {
             timer = setTimeout(() => {
                 setFlag(false)
                 snakePosition(snake, direction)
-            }, !flag ? speedSnake(score) : speedSnake(score)/2)
+            }, !flag ? speedSnake(score) : speedSnake(score) / 2)
         }
 
     }, [snake, direction])
-
 
 
     useEffect(async () => {
@@ -142,7 +148,6 @@ function App() {
         })
         return () => setScoresToState()
     }, [db])
-
 
     if (isCollide) return <div className={'flex items-center justify-center h-screen'}>
         <div className={'text-xl'}>
@@ -199,20 +204,26 @@ function App() {
                 <div className={'flex justify-center items-center'}>
                     <div
                         className={'flex flex-col justify-center items-center text-center font-bold text-lg cursor-pointer text-red-900 h-16 w-16 bg-gray-300'}
-                        ><div className={'text-sm text-gray-500'}>Arrow</div> Up
+                    >
+                        <div className={'text-sm text-gray-500'}>Arrow</div>
+                        Up
                     </div>
                 </div>
                 <div className={'flex justify-between'}>
                     <div className={'flex justify-center items-center'}>
                         <div
                             className={'flex flex-col justify-center items-center text-center font-bold text-lg cursor-pointer text-red-900 h-16 w-16 bg-gray-300'}
-                            ><div className={'text-sm text-gray-500'}>Arrow</div> Left
+                        >
+                            <div className={'text-sm text-gray-500'}>Arrow</div>
+                            Left
                         </div>
                     </div>
                     <div className={'flex justify-center items-center'}>
                         <div
                             className={'flex flex-col justify-center items-center text-center font-bold text-lg cursor-pointer text-red-900 h-16 w-16 bg-gray-300'}
-                            ><div className={'text-sm text-gray-500'}>Arrow</div> Right
+                        >
+                            <div className={'text-sm text-gray-500'}>Arrow</div>
+                            Right
                         </div>
                     </div>
                 </div>
@@ -220,29 +231,31 @@ function App() {
                     <div className={'flex justify-center items-center'}>
                         <div
                             className={'flex flex-col justify-center text-center items-center font-bold text-lg cursor-pointer text-red-900 h-16 w-16 bg-gray-300'}
-                           ><div className={'text-sm text-gray-500'}>Arrow</div> Down
+                        >
+                            <div className={'text-sm text-gray-500'}>Arrow</div>
+                            Down
                         </div>
                     </div>
                 </div>
                 {inp && <div className={'absolute opacity-0'}>
-                    <input onBlur={()=>{
+                    <input onBlur={() => {
                         setInp(false)
-                        setTimeout(()=>{
+                        setTimeout(() => {
                             setInp(true)
-                        },100)
-                    }} autoFocus={true} onKeyDown={(e)=>{
+                        }, 100)
+                    }} autoFocus={true} onKeyDown={(e) => {
                         clearTimeout(timer)
                         setFlag(true)
-                        if(e.keyCode === 37) {
+                        if (e.keyCode === 37) {
                             setDirection(directions.left)
                         }
-                        if(e.keyCode === 39) {
+                        if (e.keyCode === 39) {
                             setDirection(directions.right)
                         }
-                        if(e.keyCode === 38) {
+                        if (e.keyCode === 38) {
                             setDirection(directions.up)
                         }
-                        if(e.keyCode === 40) {
+                        if (e.keyCode === 40) {
                             setDirection(directions.down)
                         }
                     }} className={'p-2'} placeholder={'Enter...'} onChange={(e) => setUserInput(e.target.value)}
