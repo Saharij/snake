@@ -21,10 +21,14 @@ function refreshPage() {
 }
 
 function App() {
-    const grid = 16
-    const defaultSnake = [{x: 8, y: 8}, {x: 8, y: 7}, {x: 8, y: 6}]
-    const rows = Array(16).fill(0).map((_, index) => index)
-    const cols = Array(16).fill(0).map((_, index) => index)
+    const grid = 24
+    const cell = 5
+    const defaultSnake = [{x: 8, y: 8}, {x: 8, y: 7}, {x: 8, y: 6}, {x: 8, y: 5}, {x: 8, y: 4}, {x: 8, y: 3}, {
+        x: 8,
+        y: 2
+    }, {x: 8, y: 1}, {x: 8, y: 0}]
+    const rows = Array(grid).fill(0).map((_, index) => index)
+    const cols = Array(grid).fill(0).map((_, index) => index)
     const [snake, setSnake] = useState(defaultSnake)
     const [food, setFood] = useState({
         x: Math.ceil(Math.random() * (grid - 1)),
@@ -38,7 +42,6 @@ function App() {
     const [user, setUser] = useState(null)
     const [userInput, setUserInput] = useState('')
     const [inp, setInp] = useState(true)
-    const [opacity, setOpacity] = useState(100)
 
     const directions = {
         left: {x: -1, y: 0},
@@ -46,14 +49,13 @@ function App() {
         up: {x: 0, y: -1},
         down: {x: 0, y: 1}
     }
+    const [direction, setDirection] = useState(directions.left)
     const resultObj = {
         user,
         score,
         timestamp: serverTimestamp()
 
     }
-
-    const [direction, setDirection] = useState(directions.left)
 
     const createScore = async () => {
         if (scores) {
@@ -92,11 +94,10 @@ function App() {
     }
 
     function speedSnake(currentScore) {
-        if (currentScore > 10 && currentScore <= 20) return 250
-        if (currentScore > 20 && currentScore <= 30) return 200
-        if (currentScore > 30 && currentScore <= 40) return 150
-        if (currentScore > 40) return 100
-        return 300
+        if (currentScore > 20 && currentScore <= 40) return 150
+        if (currentScore > 40 && currentScore <= 80) return 100
+        if (currentScore > 80) return 50
+        return 200
     }
 
     function collideSnake(snakeArg) {
@@ -128,15 +129,15 @@ function App() {
         for (let i = 0; i < snakeXY.length; i++) {
             if (snakeXY[i].x === x && snakeXY[i].y === y) {
                 if (i === 0) return <div
-                    className={`h-5 w-5 bg-red-900`}></div>
-                return <div className={`h-5 w-5 bg-black`}></div>
+                                         className={`h-${cell} w-${cell} transition-all duration-1000 bg-red-900`}></div>
+                return <div className={`h-${cell} w-${cell} bg-black`}></div>
             }
         }
     }
 
     function getFood(x, y, foodArg) {
         if (foodArg.x === x && foodArg.y === y) {
-            return <div className={`h-5 w-5 bg-red-900`}></div>
+            return <div className={`h-3 w-3 bg-red-900`}></div>
         }
     }
 
@@ -162,14 +163,13 @@ function App() {
     }, [isCollide])
 
     let timer
-    useEffect(() => {
+    useEffect(async () => {
         if (!isCollide) {
-            setOpacity(100)
             collideSnake(snake)
             timer = setTimeout(() => {
                 setFlag(false)
                 snakePosition(snake, direction)
-            }, !flag ? speedSnake() : speedSnake() / 2)
+            }, !flag ? speedSnake(score) : speedSnake(score) / 2)
         }
     }, [snake, direction])
 
@@ -243,7 +243,7 @@ function App() {
                     <div
                         className={'flex flex-col justify-center items-center text-center font-bold text-lg cursor-pointer text-red-900 h-16 w-16 bg-gray-300'}
                     >
-                        <div onClick={() => setOpacity(10)} className={'text-sm text-gray-500'}>Arrow</div>
+                        <div>Arrow</div>
                         Up
                     </div>
                 </div>
@@ -270,7 +270,7 @@ function App() {
                         <div
                             className={'flex flex-col justify-center text-center items-center font-bold text-lg cursor-pointer text-red-900 h-16 w-16 bg-gray-300'}
                         >
-                            <div onClick={() => setOpacity(100)} className={'text-sm text-gray-500'}>Arrow</div>
+                            <div>Arrow</div>
                             Down
                         </div>
                     </div>
@@ -305,8 +305,8 @@ function App() {
                     <div>
                         {
                             cols.map(y => (
-                                <div
-                                    className={'text-black flex justify-center items-center w-9 h-9 bg-blue-500 border border-gray-700'}>
+                                <div style={{borderLeft: 'solid 1px black', borderTop: 'solid 1px black'}}
+                                     className={`text-black flex justify-center items-center w-${cell} h-${cell} bg-blue-500 opacity-90`}>
                                     {getSnake(x, y, snake) || null}
                                     {getFood(x, y, food) || null}
                                 </div>
