@@ -7,11 +7,14 @@ import {
     onSnapshot,
     query,
     orderBy,
-    where,
     deleteDoc,
     doc
 } from "firebase/firestore";
 import {db} from "./firebase";
+import snakeAudio from './6086f89846998c4.mp3'
+import snakeDy from './Sound_20955.mp3'
+
+let audioEat
 
 function refreshPage() {
     window.location.reload()
@@ -35,6 +38,7 @@ function App() {
     const [user, setUser] = useState(null)
     const [userInput, setUserInput] = useState('')
     const [inp, setInp] = useState(true)
+    const [opacity, setOpacity] = useState(100)
 
     const directions = {
         left: {x: -1, y: 0},
@@ -49,21 +53,12 @@ function App() {
 
     }
 
-    useEffect(()=>{
-        if(user){
-            console.log(scores.filter(score => score.user === user)[0])
-        }
-
-    },[user])
-
-
-
     const [direction, setDirection] = useState(directions.left)
 
     const createScore = async () => {
-        if(scores){
+        if (scores) {
             const nameAlready = scores.filter(score => score.user === user)
-            if(nameAlready && nameAlready.length > 0){
+            if (nameAlready && nameAlready.length > 0) {
                 const docRefDelete = await deleteDoc(doc(db, 'scores', nameAlready[0]?.id))
                 const docRefCreate = await addDoc(collection(db, 'scores'), resultObj)
             } else {
@@ -73,10 +68,27 @@ function App() {
     }
 
     async function getAudio() {
-        let audio = await new Audio();
-        audio.src = "https://pod-zvonok.ru/_ld/52/5216_pod-zvonok.ru__.mp3";
-        audio.volume = 1;
-        audio.play()
+        if (!isCollide) {
+            await new Promise((resolve, reject) => {
+                if (audioEat) {
+                    audioEat.pause()
+                    audioEat = null
+                }
+                resolve()
+            }).then(async () => {
+                audioEat = await new Audio();
+                audioEat.src = snakeAudio;
+                audioEat.volume = 0.3;
+                audioEat.play()
+                return null
+            })
+        } else {
+            let audioDy = await new Audio();
+            audioDy.src = snakeDy;
+            audioDy.volume = 1;
+            audioDy.play()
+        }
+
     }
 
     function speedSnake(currentScore) {
@@ -111,10 +123,12 @@ function App() {
         return j
     }
 
+
     function getSnake(x, y, snakeXY) {
         for (let i = 0; i < snakeXY.length; i++) {
             if (snakeXY[i].x === x && snakeXY[i].y === y) {
-                if (i === 0) return <div className={`h-5 w-5 bg-red-900`}></div>
+                if (i === 0) return <div
+                    className={`h-5 w-5 bg-red-900`}></div>
                 return <div className={`h-5 w-5 bg-black`}></div>
             }
         }
@@ -143,16 +157,20 @@ function App() {
         }
     }
 
+    useEffect(async () => {
+        if (isCollide) await getAudio()
+    }, [isCollide])
+
     let timer
     useEffect(() => {
         if (!isCollide) {
+            setOpacity(100)
             collideSnake(snake)
             timer = setTimeout(() => {
                 setFlag(false)
                 snakePosition(snake, direction)
-            }, !flag ? speedSnake(score) : speedSnake(score) / 2)
+            }, !flag ? speedSnake() : speedSnake() / 2)
         }
-
     }, [snake, direction])
 
 
@@ -225,7 +243,7 @@ function App() {
                     <div
                         className={'flex flex-col justify-center items-center text-center font-bold text-lg cursor-pointer text-red-900 h-16 w-16 bg-gray-300'}
                     >
-                        <div className={'text-sm text-gray-500'}>Arrow</div>
+                        <div onClick={() => setOpacity(10)} className={'text-sm text-gray-500'}>Arrow</div>
                         Up
                     </div>
                 </div>
@@ -252,7 +270,7 @@ function App() {
                         <div
                             className={'flex flex-col justify-center text-center items-center font-bold text-lg cursor-pointer text-red-900 h-16 w-16 bg-gray-300'}
                         >
-                            <div className={'text-sm text-gray-500'}>Arrow</div>
+                            <div onClick={() => setOpacity(100)} className={'text-sm text-gray-500'}>Arrow</div>
                             Down
                         </div>
                     </div>
