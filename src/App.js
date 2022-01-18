@@ -124,12 +124,12 @@ function App() {
         return j
     }
 
-
     function getSnake(x, y, snakeXY) {
         for (let i = 0; i < snakeXY.length; i++) {
             if (snakeXY[i].x === x && snakeXY[i].y === y) {
-                if (i === 0) return <div
-                                         className={`h-${cell} w-${cell} transition-all duration-1000 bg-red-900`}></div>
+                if (i === 0) return <div>
+                    <div className={`h-${cell} w-${cell} transition-all duration-1000 bg-red-900`}></div>
+                </div>
                 return <div className={`h-${cell} w-${cell} bg-black`}></div>
             }
         }
@@ -137,7 +137,7 @@ function App() {
 
     function getFood(x, y, foodArg) {
         if (foodArg.x === x && foodArg.y === y) {
-            return <div className={`h-3 w-3 bg-red-900`}></div>
+            return <div className={`h-${cell} w-${cell} bg-red-900`}></div>
         }
     }
 
@@ -186,6 +186,7 @@ function App() {
         })
         return () => setScoresToState()
     }, [db])
+
 
     if (isCollide) return <div className={'flex items-center justify-center h-screen'}>
         <div className={'text-xl'}>
