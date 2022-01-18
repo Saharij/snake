@@ -6,7 +6,10 @@ import {
     serverTimestamp,
     onSnapshot,
     query,
-    orderBy
+    orderBy,
+    where,
+    deleteDoc,
+    doc
 } from "firebase/firestore";
 import {db} from "./firebase";
 
@@ -46,10 +49,27 @@ function App() {
 
     }
 
+    useEffect(()=>{
+        if(user){
+            console.log(scores.filter(score => score.user === user)[0])
+        }
+
+    },[user])
+
+
+
     const [direction, setDirection] = useState(directions.left)
 
     const createScore = async () => {
-        const docRef = await addDoc(collection(db, 'scores'), resultObj)
+        if(scores){
+            const nameAlready = scores.filter(score => score.user === user)
+            if(nameAlready && nameAlready.length > 0){
+                const docRefDelete = await deleteDoc(doc(db, 'scores', nameAlready[0]?.id))
+                const docRefCreate = await addDoc(collection(db, 'scores'), resultObj)
+            } else {
+                const docRef = await addDoc(collection(db, 'scores'), resultObj)
+            }
+        }
     }
 
     async function getAudio() {
