@@ -15,3 +15,14 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.scroll-none::-webkit-scrollbar {
+  display: none;
+}
+
+.shadow:hover{
+  transition: all;
+  transition-duration: 0.5s;
+  box-shadow: -5px 5px 5px black;
+}
+

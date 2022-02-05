@@ -3,9 +3,11 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      scale: {
+        '80': '0.8',
+      }
+    },
   },
   plugins: [],
 }
-
-// mode: process.env.NODE_ENV && 'jit',
